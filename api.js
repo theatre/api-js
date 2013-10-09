@@ -83,6 +83,75 @@
         });
     };
 
+    // dates et lieu de représentation d'un spectacle
+    $.fn.thnetSpectacleSchedule = function(options){
+
+        // div de destination
+        var destDiv = this.selector;
+
+        // paramètres et options
+        var options = $.extend({
+            apiRequest: '/api/',
+            apiKey: null, // clé API
+            entryPoint: 'http://www.theatre-contemporain.net', // point d'entrée
+            jsonFormater: null
+        },options);
+
+        console.log(options.entryPoint + options.apiRequest + '?callback=?');
+
+        // récupèrer le JSON
+        $.getJSON(options.entryPoint + options.apiRequest + '?callback=?',{
+                k: options.apiKey, // clé d'authentification
+            }, function(data){
+
+                // DEBUG si il y a un "formater" json, on l'utilise
+                if(options.jsonFormater) {
+                    $('#debug-json').html(FormatJSON(data));
+                }
+
+                var spectacle = '';
+
+                // parcourir les résultats
+                $.each(data, function(key, val) {
+
+                    spectacle += '<h5>' + val.title + '</h5>';
+
+                    // voir s'il y a des metteurs en scène
+                    if(val.hasOwnProperty('dates')) {
+                        var dates = '<ul>';
+                        // parcourir les metteurs en scène
+                        $.each(val.dates, function(iddate, resdate) {
+                            dates += '<li><strong>Le ' + resdate.date + '</strong>';
+                            // les heures
+                            if(resdate.hasOwnProperty('hours')) {
+                                dates += '&nbsp;/&nbsp;Heure(s) : '
+                                $.each(resdate.hours, function(idhour, reshour) {
+                                    dates += '&nbsp;' + reshour.hour;
+                                });
+                            }
+                            dates += '<ul>';
+                            // le lieu
+                            if(resdate.hasOwnProperty('location')) {
+                                dates += '<li>Lieu : <a href="' + resdate.location.permanent_url + '">' + resdate.location.name + '</a></li>';
+                                if(typeof(resdate.location.url_spectacle)!='undefined') {
+                                    dates += '<li>Lien vers le spectacle : ' + resdate.location.url_spectacle + '</li>';
+                                }
+                                if(typeof(resdate.location.url_booking)!='undefined') {
+                                    dates += '<li>Lien vers la réservation : ' + resdate.location.url_booking + '</li>';
+                                }
+                            }
+                            dates+= '</ul></li>';
+                        });
+                        dates += '</ul>';
+                        // ajout à spectacle
+                        spectacle += dates;
+                    }
+
+                });
+            $('<div/>', {'class': 'thnet-spectacles', html: spectacle}).appendTo(destDiv);
+        });
+    };
+
     // liste des vidéos
     $.fn.thnetVideos = function(options){
 
