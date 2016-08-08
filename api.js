@@ -133,6 +133,7 @@
                             // le lieu
                             if(resdate.hasOwnProperty('location')) {
                                 dates += '<li>Lieu : <a href="' + resdate.location.permanent_url + '">' + resdate.location.name + '</a></li>';
+                                dates += '<li>Ville : ' + resdate.location.city + '</li>';
                                 if(typeof(resdate.location.url_spectacle)!='undefined') {
                                     dates += '<li>Lien vers le spectacle : ' + resdate.location.url_spectacle + '</li>';
                                 }
